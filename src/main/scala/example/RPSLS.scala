@@ -3,6 +3,7 @@ package example
 object RPSLS extends Greeting with GameProposal with App {
   println(greeting)
   println(gameProposal)
+  Game.play()
 }
 
 trait Greeting {
