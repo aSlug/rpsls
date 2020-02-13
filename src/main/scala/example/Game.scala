@@ -19,12 +19,10 @@ object Game {
   }
 
   def outcome(playerMove: Int, botMove: Int): String = {
-    if (playerMove == botMove) {
-      "DRAW"
-    } else if (playerMove == (botMove + 1) % 3) {
-      "YOU WIN"
-    } else {
-      "YOU LOSE"
+    (playerMove, botMove) match {
+      case (playerMove, botMove) if playerMove == botMove => "DRAW"
+      case (0, 2) | (1, 0) | (2, 1) => "YOU WIN"
+      case _ => "YOU LOSE"
     }
   }
 
