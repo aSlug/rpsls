@@ -22,6 +22,5 @@ object Move {
       case "2" => Some(Move.Scissors)
       case _ => None
     }
+  }
 }
-
-
