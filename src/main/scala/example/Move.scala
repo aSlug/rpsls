@@ -1,17 +1,10 @@
 package example
 
-sealed trait Move
-object Move {
-    case object Rock extends Move
-    case object Paper extends Move
-    case object Scissors extends Move
+import io.buildo.enumero.annotations.indexedEnum
 
-  def fromString(i: String): Option[Move] = {
-    i match {
-      case "0" => Some(Rock)
-      case "1" => Some(Paper)
-      case "2" => Some(Scissors)
-      case _ => None
-    }
-  }
+@indexedEnum trait Move {
+  type Index = String
+  object Rock { "0" }
+  object Paper { "1" }
+  object Scissors { "2" }
 }

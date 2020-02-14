@@ -1,8 +1,9 @@
 package example
 
-import example.Move.{Paper, Rock, Scissors}
+import io.buildo.enumero.{CaseEnumIndex, CaseEnumSerialization}
 
 import scala.util.Random
+import example.Move
 
 object Game {
   def play(): Unit = {
@@ -10,10 +11,10 @@ object Game {
 
     val input = scala.io.StdIn.readLine()
 
-    Move.fromString(input) match {
+    CaseEnumIndex[Move].caseFromIndex(input) match {
       case Some(playerMove) => {
         val botMove = generateBotMove()
-        println(s"YOU: ${playerMove} - ME: ${botMove}")
+        println(s"YOU: ${CaseEnumSerialization[Move].caseToString(playerMove)} - ME: ${CaseEnumSerialization[Move].caseToString(botMove)}")
         println(outcome(playerMove, botMove))
       }
       case None => println("Invalid input")
@@ -22,7 +23,7 @@ object Game {
   }
 
   def generateBotMove(): Move = {
-    Random.shuffle(List(Move.Rock, Move.Paper, Move.Scissors)).head
+    Random.shuffle(List(Rock, Paper, Scissors)).head
   }
 
   def outcome(playerMove: Move, botMove: Move): String = {

@@ -7,8 +7,10 @@ ThisBuild / organizationName := "example"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "rpsls",
-    libraryDependencies += scalaTest % Test
+      name := "rpsls",
+      resolvers += Resolver.bintrayRepo("buildo", "maven"),
+      libraryDependencies += "io.buildo" %% "enumero" % "1.2.1",
+      addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
   )
 
 // Uncomment the following for publishing to Sonatype.
