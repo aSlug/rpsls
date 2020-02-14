@@ -1,5 +1,7 @@
 package example
 
+import example.Move.{Paper, Rock, Scissors}
+
 import scala.util.Random
 
 object Game {
@@ -19,14 +21,14 @@ object Game {
 
   }
 
-  def generateBotMove(): Move.EnumVal = {
+  def generateBotMove(): Move = {
     Random.shuffle(List(Move.Rock, Move.Paper, Move.Scissors)).head
   }
 
-  def outcome(playerMove: Move.EnumVal, botMove: Move.EnumVal): String = {
+  def outcome(playerMove: Move, botMove: Move): String = {
     (playerMove, botMove) match {
       case (playerMove, botMove) if playerMove == botMove => "DRAW"
-      case (Move.Rock, Move.Scissors) | (Move.Scissors, Move.Paper) | (Move.Paper, Move.Rock) => "YOU WIN"
+      case (Rock, Scissors) | (Scissors, Paper) | (Paper, Rock) => "YOU WIN"
       case _ => "YOU LOSE"
     }
   }

@@ -1,16 +1,16 @@
 package example
 
+sealed trait Move
 object Move {
-    sealed trait EnumVal
-    case object Rock extends EnumVal
-    case object Paper extends EnumVal
-    case object Scissors extends EnumVal
+    case object Rock extends Move
+    case object Paper extends Move
+    case object Scissors extends Move
 
-  def fromString(i: String): Option[Move.EnumVal] = {
+  def fromString(i: String): Option[Move] = {
     i match {
-      case "0" => Some(Move.Rock)
-      case "1" => Some(Move.Paper)
-      case "2" => Some(Move.Scissors)
+      case "0" => Some(Rock)
+      case "1" => Some(Paper)
+      case "2" => Some(Scissors)
       case _ => None
     }
   }
