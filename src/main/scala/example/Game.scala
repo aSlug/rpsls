@@ -8,15 +8,19 @@ object Game {
 
     val input = scala.io.StdIn.readLine()
 
-    val playerMove = Move.fromString(input)
-    if (playerMove.isEmpty) {
-      println("Invalid input")
-      return
+    Move.fromString(input) match {
+      case Some(playerMove) => {
+        val botMove = generateBotMove()
+        println(s"YOU: ${playerMove} - ME: ${botMove}")
+        println(outcome(playerMove, botMove))
+      }
+      case None => println("Invalid input")
     }
-    val botMove = Move.fromInt(Random.nextInt(3))
 
-    println(s"YOU: ${playerMove.get} - ME: ${botMove.get}")
-    println(outcome(playerMove.get, botMove.get))
+  }
+
+  def generateBotMove(): Move.EnumVal = {
+    Random.shuffle(List(Move.Rock, Move.Paper, Move.Scissors)).head
   }
 
   def outcome(playerMove: Move.EnumVal, botMove: Move.EnumVal): String = {
