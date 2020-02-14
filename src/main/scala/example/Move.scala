@@ -6,15 +6,6 @@ object Move {
     case object Paper extends EnumVal
     case object Scissors extends EnumVal
 
-  def fromInt(i: Int): Option[Move.EnumVal] = {
-    i match {
-      case 0 => Some(Move.Rock)
-      case 1 => Some(Move.Paper)
-      case 2 => Some(Move.Scissors)
-      case _ => None
-    }
-  }
-
   def fromString(i: String): Option[Move.EnumVal] = {
     i match {
       case "0" => Some(Move.Rock)
