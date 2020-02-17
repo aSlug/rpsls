@@ -1,4 +1,7 @@
-package example
+package rpsls
+
+import io.buildo.enumero.{CaseEnumIndex, CaseEnumSerialization}
+import rpsls.Move._
 
 import scala.util.Random
 
@@ -8,10 +11,10 @@ object Game {
 
     val input = scala.io.StdIn.readLine()
 
-    Move.fromString(input) match {
+    CaseEnumIndex[Move].caseFromIndex(input) match {
       case Some(playerMove) => {
         val botMove = generateBotMove()
-        println(s"YOU: ${playerMove} - ME: ${botMove}")
+        println(s"YOU: ${Move.caseToString(playerMove)} - ME: ${Move.caseToString(botMove)}")
         println(outcome(playerMove, botMove))
       }
       case None => println("Invalid input")
@@ -19,14 +22,14 @@ object Game {
 
   }
 
-  def generateBotMove(): Move.EnumVal = {
-    Random.shuffle(List(Move.Rock, Move.Paper, Move.Scissors)).head
+  def generateBotMove(): Move = {
+    Random.shuffle(List(Rock, Paper, Scissors)).head
   }
 
-  def outcome(playerMove: Move.EnumVal, botMove: Move.EnumVal): String = {
+  def outcome(playerMove: Move, botMove: Move): String = {
     (playerMove, botMove) match {
       case (playerMove, botMove) if playerMove == botMove => "DRAW"
-      case (Move.Rock, Move.Scissors) | (Move.Scissors, Move.Paper) | (Move.Paper, Move.Rock) => "YOU WIN"
+      case (Rock, Scissors) | (Scissors, Paper) | (Paper, Rock) => "YOU WIN"
       case _ => "YOU LOSE"
     }
   }

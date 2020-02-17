@@ -1,4 +1,4 @@
-package example
+package rpsls
 
 object RPSLS extends Greeting with GameProposal with App {
   println(greeting)
