@@ -1,4 +1,4 @@
-package example
+package rpsls
 
 import io.buildo.enumero.annotations.indexedEnum
 

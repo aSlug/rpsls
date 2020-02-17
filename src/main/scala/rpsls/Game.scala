@@ -1,9 +1,9 @@
-package example
+package rpsls
 
 import io.buildo.enumero.{CaseEnumIndex, CaseEnumSerialization}
+import rpsls.Move._
 
 import scala.util.Random
-import example.Move
 
 object Game {
   def play(): Unit = {
