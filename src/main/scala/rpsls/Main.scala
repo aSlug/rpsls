@@ -20,15 +20,17 @@ object Main extends App {
   implicit val executionContext = system.dispatcher
 
   val route =
-    path("play") {
-        post {
-          entity(as[Request]) { req: Request =>
-            val outcome = Game.play(req.userMove)
-            val res = Response(userMove = outcome._1, computerMove = outcome._2, result = outcome._3)
-            complete(res)
+    pathPrefix("rps") {
+      path("play") {
+          post {
+            entity(as[Request]) { req: Request =>
+              val outcome = Game.play(req.userMove)
+              val res = Response(userMove = outcome._1, computerMove = outcome._2, result = outcome._3)
+              complete(res)
+            }
           }
-        }
-    }
+      }
+    } ~ options(complete())
 
   val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
