@@ -14,7 +14,7 @@ object Game {
     CaseEnumIndex[Move].caseFromIndex(input) match {
       case Some(playerMove) => {
         val botMove = generateBotMove()
-        println(s"YOU: ${CaseEnumSerialization[Move].caseToString(playerMove)} - ME: ${CaseEnumSerialization[Move].caseToString(botMove)}")
+        println(s"YOU: ${Move.caseToString(playerMove)} - ME: ${Move.caseToString(botMove)}")
         println(outcome(playerMove, botMove))
       }
       case None => println("Invalid input")
