@@ -11,7 +11,8 @@ import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 
-import rpsls.PlayRequest
+import rpsls.Request
+import rpsls.Response
 
 object Main extends App {
   implicit val system = ActorSystem("rps")
@@ -21,9 +22,10 @@ object Main extends App {
   val route =
     path("play") {
         post {
-          entity(as[PlayRequest]) { req: PlayRequest =>
-            val outcome = Game.play(req.playerMove)
-            complete(outcome)
+          entity(as[Request]) { req: Request =>
+            val outcome = Game.play(req.userMove)
+            val res = Response(userMove = outcome._1, computerMove = outcome._2, result = outcome._3)
+            complete(res)
           }
         }
     }
