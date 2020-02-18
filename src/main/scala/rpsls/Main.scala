@@ -6,7 +6,12 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import scala.io.StdIn
-import akka.http.scaladsl.model.{ HttpResponse, StatusCodes, ContentType, HttpEntity}
+import akka.http.scaladsl.model.{
+  HttpResponse,
+  StatusCodes,
+  ContentType,
+  HttpEntity
+}
 import wiro.Config
 import wiro.server.akkaHttp._
 import wiro.server.akkaHttp.FailSupport._
@@ -15,8 +20,7 @@ import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 
-import rpsls.Request
-import rpsls.Response
+import ApiResponse._
 
 object Main extends App with RouterDerivationModule {
   implicit val system = ActorSystem("rps")
