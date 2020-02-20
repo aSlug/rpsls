@@ -1,25 +1,36 @@
 package rpsls
 
-import rpsls.Move._
-import rpsls.Result._
+import Move._
+import Outcome._
 
 import scala.util.Random
 
-object Game {
-  def play(playerMove: Move): (Move, Move, Result) = {
-    val botMove = generateBotMove()
-    return outcome(playerMove, botMove)
-  }
+import scala.concurrent.{ExecutionContext, Future}
+import wiro.annotation._
+
+@path("rps")
+trait GameAPI {
+  @command
+  def play(userMove: Move): Future[Either[Throwable, ApiResponse]]
+}
+
+class GameAPIImpl(implicit exc: ExecutionContext) extends GameAPI {
+  override def play(playerMove: Move): Future[Either[Throwable, ApiResponse]] =
+    Future {
+      val botMove = generateBotMove()
+      val out = outcome(playerMove, botMove)
+      Right(ApiResponse.tupled((playerMove, botMove, out)))
+    }
 
   def generateBotMove(): Move = {
     Random.shuffle(List(Rock, Paper, Scissors)).head
   }
 
-  def outcome(playerMove: Move, botMove: Move): (Move, Move, Result) = {
+  def outcome(playerMove: Move, botMove: Move): Outcome = {
     (playerMove, botMove) match {
-      case (playerMove, botMove) if playerMove == botMove => (playerMove, botMove, Draw)
-      case (Rock, Scissors) | (Scissors, Paper) | (Paper, Rock) => (playerMove, botMove, Win)
-      case _ => (playerMove, botMove, Lose)
+      case (playerMove, botMove) if playerMove == botMove       => Draw
+      case (Rock, Scissors) | (Scissors, Paper) | (Paper, Rock) => Win
+      case _                                                    => Lose
     }
   }
 
