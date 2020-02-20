@@ -20,8 +20,6 @@ import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 
-import ApiResponse._
-
 object Main extends App with RouterDerivationModule {
   implicit val system = ActorSystem("rps")
   implicit val materializer = ActorMaterializer()
@@ -30,7 +28,7 @@ object Main extends App with RouterDerivationModule {
   // actually never used
   implicit def throwableResponse: ToHttpResponse[Throwable] = null
 
-  val routes = deriveRouter[GameApi](new GameApiImpl)
+  val routes = deriveRouter[GameAPI](new GameAPIImpl)
 
   val server = new HttpRPCServer(
     config = Config("localhost", 8080),

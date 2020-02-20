@@ -2,7 +2,6 @@ package rpsls
 
 import Move._
 import Outcome._
-import ApiResponse._
 
 import scala.util.Random
 
