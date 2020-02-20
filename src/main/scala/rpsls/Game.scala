@@ -11,11 +11,11 @@ import wiro.annotation._
 @path("rps")
 trait GameAPI {
   @command
-  def play(userMove: Move): Future[Either[Error, ApiResponse]]
+  def play(userMove: Move): Future[Either[Throwable, ApiResponse]]
 }
 
 class GameAPIImpl(implicit exc: ExecutionContext) extends GameAPI {
-  override def play(playerMove: Move): Future[Either[Error, ApiResponse]] =
+  override def play(playerMove: Move): Future[Either[Throwable, ApiResponse]] =
     Future {
       val botMove = generateBotMove()
       val out = outcome(playerMove, botMove)
