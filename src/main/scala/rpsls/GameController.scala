@@ -10,7 +10,7 @@ import wiro.annotation._
 trait GameController {
   @command
   def play(userMove: Move): Future[Either[Throwable, Unit]]
-  @command
+  @query
   def result(): Future[Either[Throwable, ApiResponse]]
 }
 
