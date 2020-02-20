@@ -8,13 +8,13 @@ import Outcome._
 
 trait GameService {
   def makePlay(playerMove: Move): Unit
-  def getResult(): Option[Outcome]
+  def getResult(): Option[Game]
 }
 
 class GameServiceImpl(repo: GameRepo) extends GameService {
 
   override def makePlay(playerMove: Move): Unit = ???
-  override def getResult(): Option[Outcome] = ???
+  override def getResult(): Option[Game] = ???
 
   private def generateBotMove(): Move = {
     Random.shuffle(List(Rock, Paper, Scissors)).head
