@@ -28,7 +28,10 @@ object Main extends App with RouterDerivationModule {
   // actually never used
   implicit def throwableResponse: ToHttpResponse[Throwable] = null
 
-  val routes = deriveRouter[GameAPI](new GameAPIImpl)
+  val repo = new GameRepoImpl()
+  val service = new GameServiceImpl(repo)
+  val controller = new GameControllerImpl(service)
+  val routes = deriveRouter[GameController](controller)
 
   val server = new HttpRPCServer(
     config = Config("localhost", 8080),

@@ -1,4 +1,5 @@
 package rpsls
+
 import rpsls.model._
 
 import scala.collection.concurrent.TrieMap
