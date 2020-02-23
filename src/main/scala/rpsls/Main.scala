@@ -21,6 +21,7 @@ import io.circe.generic.auto._
 import io.buildo.enumero.circe._
 import rpsls.model.GameNotFound
 
+import io.circe.generic.auto._
 import io.circe.syntax._
 
 object Main extends App with RouterDerivationModule {
