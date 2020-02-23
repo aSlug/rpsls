@@ -11,7 +11,7 @@ trait GameController {
   @command
   def play(userMove: Move): Future[Either[Throwable, Unit]]
   @query
-  def result(): Future[Either[Throwable, ApiResponse]]
+  def result(): Future[Either[GameNotFound, ApiResponse]]
 }
 
 class GameControllerImpl(gameService: GameService)(
@@ -23,16 +23,17 @@ class GameControllerImpl(gameService: GameService)(
       Right(gameService.makePlay(playerMove))
     }
 
-  override def result(): Future[Either[Throwable, ApiResponse]] = Future {
-    gameService
-      .getResult()
-      .toRight(new Throwable)
-      .map(game =>
-        ApiResponse(
-          game.userMove,
-          game.computerMove,
-          game.result
+  override def result(): Future[Either[GameNotFound, ApiResponse]] = Future {
+    gameService.getResult() match {
+      case None => Left(new GameNotFound("Game not found"))
+      case Some(game) =>
+        Right(
+          ApiResponse(
+            game.userMove,
+            game.computerMove,
+            game.result
+          )
         )
-      )
+    }
   }
 }

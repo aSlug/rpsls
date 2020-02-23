@@ -19,14 +19,26 @@ import wiro.server.akkaHttp.FailSupport._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
+import rpsls.model.GameNotFound
+
+import io.circe.syntax._
 
 object Main extends App with RouterDerivationModule {
   implicit val system = ActorSystem("rps")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  // actually never used
   implicit def throwableResponse: ToHttpResponse[Throwable] = null
+
+  implicit def notFoundToResponse = new ToHttpResponse[GameNotFound] {
+    def response(error: GameNotFound) = HttpResponse(
+      status = StatusCodes.NotFound,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        error.asJson.noSpaces
+      )
+    )
+  }
 
   val repo = new GameRepoImpl()
   val service = new GameServiceImpl(repo)
