@@ -7,13 +7,13 @@ import Move._
 import Outcome._
 
 trait GameService {
-  def makePlay(playerMove: Move): Int
+  def makePlay(playerMove: Move): Option[Int]
   def getResult(id: Int): Option[Game]
 }
 
 class GameServiceImpl(repo: GameRepo) extends GameService {
 
-  override def makePlay(playerMove: Move): Int = {
+  override def makePlay(playerMove: Move): Option[Int] = {
     val botMove = generateBotMove();
     val outcome = calculateOutcome(playerMove, botMove)
     repo.write(Game(playerMove, botMove, outcome))

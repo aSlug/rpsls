@@ -20,7 +20,10 @@ class GameControllerImpl(gameService: GameService)(
 
   override def play(playerMove: Move): Future[Either[Throwable, PlayResponse]] =
     Future {
-      Right(gameService.makePlay(playerMove))
+      gameService.makePlay(playerMove) match {
+        case None     => Left(new Throwable())
+        case Some(id) => Right(PlayResponse(id))
+      }
     }
 
   override def result(id: Int): Future[Either[GameNotFound, ResultResponse]] =
