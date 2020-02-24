@@ -24,7 +24,14 @@ import rpsls.model.GameNotFound
 import io.circe.generic.auto._
 import io.circe.syntax._
 
+import slick.jdbc.H2Profile.api._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+
 object Main extends App with RouterDerivationModule {
+
+  val db = Database.forConfig("h2mem1")
+
   implicit val system = ActorSystem("rps")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
@@ -41,7 +48,7 @@ object Main extends App with RouterDerivationModule {
     )
   }
 
-  val repo = new GameRepoImpl()
+  val repo = new GameRepoImpl(db)
   val service = new GameServiceImpl(repo)
   val controller = new GameControllerImpl(service)
   val routes = deriveRouter[GameController](controller)
