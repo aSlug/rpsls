@@ -1,4 +1,4 @@
-package rpsls
+package rpsls.model
 
 import io.buildo.enumero.annotations.enum
 
@@ -6,4 +6,6 @@ import io.buildo.enumero.annotations.enum
   object Rock
   object Paper
   object Scissors
+  object Lizard
+  object Spock
 }

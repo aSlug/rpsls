@@ -1,4 +1,4 @@
-package rpsls
+package rpsls.model
 
 import io.buildo.enumero.annotations.enum
 
