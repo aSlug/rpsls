@@ -12,7 +12,7 @@ import scala.util.Success
 @path("rps")
 trait GameController {
   @command
-  def play(userMove: Move): Future[PlayResponse]
+  def play(userMove: Move): Future[Either[Throwable, PlayResponse]]
   @query
   def result(id: Int): Future[Either[GameNotFound, ResultResponse]]
 }
@@ -21,8 +21,8 @@ class GameControllerImpl(gameService: GameService)(
     implicit exc: ExecutionContext
 ) extends GameController {
 
-  override def play(playerMove: Move): Future[PlayResponse] =
-    gameService.makePlay(playerMove).map(id => PlayResponse(id))
+  override def play(playerMove: Move): Future[Either[Throwable, PlayResponse]] =
+    gameService.makePlay(playerMove).map(id => Right(PlayResponse(id)))
 
   override def result(
       id: Int
