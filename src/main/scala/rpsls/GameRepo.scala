@@ -11,10 +11,12 @@ import io.buildo.enumero.CaseEnumIndex
 import scala.concurrent.Future
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import rpsls.model.database.GameRow
+import java.{util => ju}
 
 trait GameRepo {
-  def write(game: Game): Option[Int]
-  def read(id: Int): Option[Game]
+  def write(game: Game): Future[Int]
+  def read(id: Int): Future[Option[Game]]
 }
 
 class GameRepoImpl(database: Database) extends GameRepo {
@@ -25,33 +27,27 @@ class GameRepoImpl(database: Database) extends GameRepo {
 
   private val map = TrieMap.empty[Boolean, Game]
 
-  override def write(game: Game): Option[Int] = {
-    map.put(true, game)
-    // TODO: INFILARE STA MERDA DENTRO AL DB E RITORNARE L'id ASSEGNATO
-    Some(0)
+  override def write(game: Game): Future[Int] = {
+    val insertion = (games returning games.map(_.id)) += toGameRow(game)
+    database.run(insertion)
   }
 
-  override def read(id: Int): Option[Game] = {
-    findById(id) // TODO: ESTRARRE UN Option[Game] DA STA MERDA
-    map.get(true)
-  }
-
-  private def findById(id: Int): Future[Seq[Game]] = {
+  override def read(id: Int): Future[Option[Game]] = {
+    val selectGameRow = games.filter(_.id === id).result.headOption
     database
-      .run((for (g <- games if g.id === id) yield g).result)
-      .map(_.map {
-        case (_, userMove, computerMove, result) => {
-          Game(Move.Scissors, Move.Lizard, Outcome.Win)
-        }
-      })
-
-    // TODO: COME STRACAZZO FACCIO A TIRARE FUORI SOLO UN VALORE?? SE USO .headOption POI NON SI CAPISCE COME APPLICARE UNA FUNZIONE CHE RITORNI Future[Option[Game]]
-    // database
-    //   .run((for (g <- games if g.id === id) yield g).result.headOption)
-    //   .map(_.map {
-    //     case (_, userMove, computerMove, result) => {
-    //       Game(Move.Scissors, Move.Lizard, Outcome.Win)
-    //     }
-    //   })
+      .run(selectGameRow)
+      .map(gameRow => gameRow.map(toGame))
   }
+
+  private def toGame(gameRow: GameRow): Game = Game(
+    Move.caseFromString(gameRow.playerMove).getOrElse(throw new Throwable),
+    Move.caseFromString(gameRow.botMove).getOrElse(throw new Throwable),
+    Outcome.caseFromString(gameRow.outcome).getOrElse(throw new Throwable)
+  )
+  private def toGameRow(game: Game): GameRow = GameRow(
+    0, // this will be ignored
+    game.userMove.toString(),
+    game.computerMove.toString(),
+    game.result.toString()
+  )
 }

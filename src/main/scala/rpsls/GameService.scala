@@ -5,21 +5,23 @@ import scala.util.Random
 import model._
 import Move._
 import Outcome._
+import java.{util => ju}
+import scala.concurrent.Future
 
 trait GameService {
-  def makePlay(playerMove: Move): Option[Int]
-  def getResult(id: Int): Option[Game]
+  def makePlay(playerMove: Move): Future[Int]
+  def getResult(id: Int): Future[Option[Game]]
 }
 
 class GameServiceImpl(repo: GameRepo) extends GameService {
 
-  override def makePlay(playerMove: Move): Option[Int] = {
-    val botMove = generateBotMove();
+  override def makePlay(playerMove: Move): Future[Int] = {
+    val botMove = generateBotMove()
     val outcome = calculateOutcome(playerMove, botMove)
     repo.write(Game(playerMove, botMove, outcome))
   }
 
-  override def getResult(id: Int): Option[Game] = {
+  override def getResult(id: Int): Future[Option[Game]] = {
     repo.read(id)
   }
 
