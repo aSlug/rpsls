@@ -30,7 +30,7 @@ import scala.concurrent.Await
 
 object Main extends App with RouterDerivationModule {
 
-  val db = Database.forConfig("h2mem1")
+  val db = Database.forConfig("postgresDB")
 
   implicit val system = ActorSystem("rps")
   implicit val materializer = ActorMaterializer()
