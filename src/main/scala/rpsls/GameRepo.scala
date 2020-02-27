@@ -16,7 +16,7 @@ import java.{util => ju}
 
 trait GameRepo {
   def write(game: Game): Future[Int]
-  def read(id: Int): Future[Option[Game]]
+  def read(id: Int): Future[Either[ApiError, Game]]
 }
 
 class GameRepoImpl(database: Database) extends GameRepo {
@@ -32,18 +32,32 @@ class GameRepoImpl(database: Database) extends GameRepo {
     database.run(insertion)
   }
 
-  override def read(id: Int): Future[Option[Game]] = {
+  override def read(id: Int): Future[Either[ApiError, Game]] = {
     val selectGameRow = games.filter(_.id === id).result.headOption
     database
       .run(selectGameRow)
-      .map(gameRow => gameRow.map(toGame))
+      .map(gameRow =>
+        gameRow match {
+          case None     => Left(GameNotFound())
+          case Some(gr) => toGame(gr)
+        }
+      )
   }
 
-  private def toGame(gameRow: GameRow): Game = Game(
-    Move.caseFromString(gameRow.playerMove).getOrElse(throw new Throwable),
-    Move.caseFromString(gameRow.botMove).getOrElse(throw new Throwable),
-    Outcome.caseFromString(gameRow.outcome).getOrElse(throw new Throwable)
-  )
+  private def toGame(row: GameRow): Either[ApiError, Game] = {
+    try {
+      Right(
+        Game(
+          Move.caseFromString(row.playerMove).getOrElse(throw new Throwable),
+          Move.caseFromString(row.botMove).getOrElse(throw new Throwable),
+          Outcome.caseFromString(row.outcome).getOrElse(throw new Throwable)
+        )
+      )
+    } catch {
+      case e: Throwable => Left(ParsingError())
+    }
+  }
+
   private def toGameRow(game: Game): GameRow = GameRow(
     0, // this will be ignored
     game.userMove.toString(),

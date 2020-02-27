@@ -14,4 +14,5 @@ import io.circe.syntax._
 
 trait ApiError extends Throwable {}
 
-case class GameNotFound(msg: String) extends ApiError {}
+case class GameNotFound() extends ApiError {}
+case class ParsingError() extends ApiError {}

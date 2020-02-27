@@ -19,7 +19,6 @@ import wiro.server.akkaHttp.FailSupport._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
-import rpsls.model.GameNotFound
 
 import io.circe.generic.auto._
 import io.circe.syntax._
@@ -27,6 +26,7 @@ import io.circe.syntax._
 import slick.jdbc.H2Profile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
+import rpsls.model._
 
 object Main extends App with RouterDerivationModule {
 
@@ -38,9 +38,19 @@ object Main extends App with RouterDerivationModule {
 
   implicit def throwableResponse: ToHttpResponse[Throwable] = null
 
-  implicit def notFoundToResponse = new ToHttpResponse[GameNotFound] {
+  implicit def _400ToResponse = new ToHttpResponse[ApiError] {
     def response(error: GameNotFound) = HttpResponse(
       status = StatusCodes.NotFound,
+      entity = HttpEntity(
+        ContentType(MediaTypes.`application/json`),
+        error.asJson.noSpaces
+      )
+    )
+  }
+
+  implicit def _500ToResponse = new ToHttpResponse[ApiError] {
+    def response(error: ParsingError) = HttpResponse(
+      status = StatusCodes.InternalServerError,
       entity = HttpEntity(
         ContentType(MediaTypes.`application/json`),
         error.asJson.noSpaces

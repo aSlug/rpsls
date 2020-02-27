@@ -10,7 +10,7 @@ import scala.concurrent.Future
 
 trait GameService {
   def makePlay(playerMove: Move): Future[Int]
-  def getResult(id: Int): Future[Option[Game]]
+  def getResult(id: Int): Future[Either[ApiError, Game]]
 }
 
 class GameServiceImpl(repo: GameRepo) extends GameService {
@@ -21,7 +21,7 @@ class GameServiceImpl(repo: GameRepo) extends GameService {
     repo.write(Game(playerMove, botMove, outcome))
   }
 
-  override def getResult(id: Int): Future[Option[Game]] = {
+  override def getResult(id: Int): Future[Either[ApiError, Game]] = {
     repo.read(id)
   }
 
