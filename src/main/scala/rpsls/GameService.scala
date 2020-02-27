@@ -9,13 +9,13 @@ import java.{util => ju}
 import scala.concurrent.Future
 
 trait GameService {
-  def makePlay(playerMove: Move): Future[Int]
+  def makePlay(playerMove: Move): Future[Either[ApiError, Int]]
   def getResult(id: Int): Future[Either[ApiError, Game]]
 }
 
 class GameServiceImpl(repo: GameRepo) extends GameService {
 
-  override def makePlay(playerMove: Move): Future[Int] = {
+  override def makePlay(playerMove: Move): Future[Either[ApiError, Int]] = {
     val botMove = generateBotMove()
     val outcome = calculateOutcome(playerMove, botMove)
     repo.write(Game(playerMove, botMove, outcome))

@@ -22,15 +22,20 @@ class GameControllerImpl(gameService: GameService)(
 ) extends GameController {
 
   override def play(playerMove: Move): Future[Either[Throwable, PlayResponse]] =
-    gameService.makePlay(playerMove).map(id => Right(PlayResponse(id)))
+    gameService
+      .makePlay(playerMove)
+      .map(idOrError =>
+        idOrError match {
+          case Left(error) => Left(error)
+          case Right(id)   => Right(PlayResponse(id))
+        }
+      )
 
-  override def result(
-      id: Int
-  ): Future[Either[ApiError, ResultResponse]] =
+  override def result(id: Int): Future[Either[ApiError, ResultResponse]] =
     gameService
       .getResult(id)
-      .map(op =>
-        op match {
+      .map(gameOrError =>
+        gameOrError match {
           case Left(error) => Left(error)
           case Right(game) =>
             Right(

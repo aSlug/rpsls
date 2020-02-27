@@ -15,7 +15,7 @@ import rpsls.model.database.GameRow
 import java.{util => ju}
 
 trait GameRepo {
-  def write(game: Game): Future[Int]
+  def write(game: Game): Future[Either[ApiError, Int]]
   def read(id: Int): Future[Either[ApiError, Game]]
 }
 
@@ -27,9 +27,13 @@ class GameRepoImpl(database: Database) extends GameRepo {
 
   private val map = TrieMap.empty[Boolean, Game]
 
-  override def write(game: Game): Future[Int] = {
-    val insertion = (games returning games.map(_.id)) += toGameRow(game)
-    database.run(insertion)
+  override def write(game: Game): Future[Either[ApiError, Int]] = {
+    try {
+      val insertion = (games returning games.map(_.id)) += toGameRow(game)
+      database.run(insertion).map(i => Right(i))
+    } catch {
+      case e: Error => Future { Left(GenericError()) }
+    }
   }
 
   override def read(id: Int): Future[Either[ApiError, Game]] = {

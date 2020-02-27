@@ -13,6 +13,11 @@ import io.circe.generic.auto._
 import io.circe.syntax._
 
 trait ApiError extends Throwable {}
+trait Error404 extends ApiError {}
+trait Error500 extends ApiError {}
 
-case class GameNotFound() extends ApiError {}
-case class ParsingError() extends ApiError {}
+case class GameNotFound() extends Error404 { val msg = "Game not found" }
+case class ParsingError() extends Error500 {
+  val msg = "Unable to parse result"
+}
+case class GenericError() extends Error500 { val msg = "Unknown error" }
