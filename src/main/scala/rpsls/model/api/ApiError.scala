@@ -14,9 +14,7 @@ import io.circe.syntax._
 
 sealed trait ApiError
 object ApiError {
-  case object GameNotFound extends ApiError { val msg = "Game not found" }
-  case object ParsingError extends ApiError {
-    val msg = "Unable to parse result"
-  }
-  case object GenericError extends ApiError { val msg = "Unknown error" }
+  object GameNotFound extends ApiError { val msg = "Game not found" }
+  object ParsingError extends ApiError { val msg = "Unable to parse result" }
+  object GenericError extends ApiError { val msg = "Unknown error" }
 }
