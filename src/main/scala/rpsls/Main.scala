@@ -36,8 +36,6 @@ object Main extends App with RouterDerivationModule {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  implicit def throwableToResponse: ToHttpResponse[Throwable] = null
-
   implicit def apiErrorToResponse = new ToHttpResponse[ApiError] {
     def response(error: ApiError) = error match {
       case error: GameNotFound =>
