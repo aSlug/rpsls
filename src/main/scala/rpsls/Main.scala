@@ -36,68 +36,36 @@ object Main extends App with RouterDerivationModule {
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  implicit def _throwableToResponse: ToHttpResponse[Throwable] = null
+  implicit def _ThrowableToResponse: ToHttpResponse[Throwable] = null
 
-  implicit def _apiErrorToResponse = new ToHttpResponse[ApiError] {
-    def response(error: ApiError) = HttpResponse(
-      status = StatusCodes.InternalServerError,
-      entity = HttpEntity(
-        ContentType(MediaTypes.`application/json`),
-        ""
-      )
-    )
-    def response(error: GameNotFound) = HttpResponse(
-      status = StatusCodes.NotFound,
-      entity = HttpEntity(
-        ContentType(MediaTypes.`application/json`),
-        error.asJson.noSpaces
-      )
-    )
-    def response(error: ParsingError) = HttpResponse(
-      status = StatusCodes.InternalServerError,
-      entity = HttpEntity(
-        ContentType(MediaTypes.`application/json`),
-        error.asJson.noSpaces
-      )
-    )
-    def response(error: GenericError) = HttpResponse(
-      status = StatusCodes.InternalServerError,
-      entity = HttpEntity(
-        ContentType(MediaTypes.`application/json`),
-        error.asJson.noSpaces
-      )
-    )
+  implicit def _ApiErrorToResponse = new ToHttpResponse[ApiError] {
+    def response(error: ApiError) = error match {
+      case error: GameNotFound =>
+        HttpResponse(
+          status = StatusCodes.NotFound,
+          entity = HttpEntity(
+            ContentType(MediaTypes.`application/json`),
+            error.asJson.noSpaces
+          )
+        )
+      case error: ParsingError =>
+        HttpResponse(
+          status = StatusCodes.InternalServerError,
+          entity = HttpEntity(
+            ContentType(MediaTypes.`application/json`),
+            error.asJson.noSpaces
+          )
+        )
+      case error: GenericError =>
+        HttpResponse(
+          status = StatusCodes.InternalServerError,
+          entity = HttpEntity(
+            ContentType(MediaTypes.`application/json`),
+            error.asJson.noSpaces
+          )
+        )
+    }
   }
-
-  // implicit def _GameNotFoundToResponse = new ToHttpResponse[GameNotFound] {
-  //   def response(error: GameNotFound) = HttpResponse(
-  //     status = StatusCodes.NotFound,
-  //     entity = HttpEntity(
-  //       ContentType(MediaTypes.`application/json`),
-  //       error.asJson.noSpaces
-  //     )
-  //   )
-  // }
-
-  // implicit def _ParsingErrorToResponse = new ToHttpResponse[ParsingError] {
-  //   def response(error: ParsingError) = HttpResponse(
-  //     status = StatusCodes.InternalServerError,
-  //     entity = HttpEntity(
-  //       ContentType(MediaTypes.`application/json`),
-  //       error.asJson.noSpaces
-  //     )
-  //   )
-  // }
-
-  // implicit def _ToResponse = new ToHttpResponse[GenericError] {
-  //   def response(error: GenericError) = HttpResponse(
-  //     status = StatusCodes.InternalServerError,
-  //     entity = HttpEntity(
-  //       ContentType(MediaTypes.`application/json`),
-  //       error.asJson.noSpaces
-  //     )
-  //   )
-  // }
 
   val repo = new GameRepoImpl(db)
   val service = new GameServiceImpl(repo)
