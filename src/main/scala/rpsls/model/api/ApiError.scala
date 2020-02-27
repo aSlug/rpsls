@@ -12,8 +12,11 @@ import akka.http.scaladsl.model.MediaTypes
 import io.circe.generic.auto._
 import io.circe.syntax._
 
-trait ApiError extends Throwable {}
-
-case class GameNotFound(msg: String) extends ApiError {}
-case class ParsingError(msg: String) extends ApiError {}
-case class GenericError(msg: String) extends ApiError {}
+sealed trait ApiError
+object ApiError {
+  case object GameNotFound extends ApiError { val msg = "Game not found" }
+  case object ParsingError extends ApiError {
+    val msg = "Unable to parse result"
+  }
+  case object GenericError extends ApiError { val msg = "Unknown error" }
+}

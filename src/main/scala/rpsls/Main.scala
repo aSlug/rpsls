@@ -27,6 +27,7 @@ import slick.jdbc.H2Profile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import rpsls.model._
+import rpsls.model.ApiError.GameNotFound
 
 object Main extends App with RouterDerivationModule {
 
@@ -38,7 +39,7 @@ object Main extends App with RouterDerivationModule {
 
   implicit def apiErrorToResponse = new ToHttpResponse[ApiError] {
     def response(error: ApiError) = error match {
-      case error: GameNotFound =>
+      case ApiError.GameNotFound =>
         HttpResponse(
           status = StatusCodes.NotFound,
           entity = HttpEntity(
@@ -46,7 +47,7 @@ object Main extends App with RouterDerivationModule {
             error.asJson.noSpaces
           )
         )
-      case error: ParsingError =>
+      case ApiError.ParsingError =>
         HttpResponse(
           status = StatusCodes.InternalServerError,
           entity = HttpEntity(
@@ -54,7 +55,7 @@ object Main extends App with RouterDerivationModule {
             error.asJson.noSpaces
           )
         )
-      case error: GenericError =>
+      case ApiError.GenericError =>
         HttpResponse(
           status = StatusCodes.InternalServerError,
           entity = HttpEntity(

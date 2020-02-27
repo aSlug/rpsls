@@ -32,7 +32,7 @@ class GameRepoImpl(database: Database) extends GameRepo {
       val insertion = (games returning games.map(_.id)) += toGameRow(game)
       database.run(insertion).map(i => Right(i))
     } catch {
-      case e: Error => Future { Left(GenericError("Unknown error")) }
+      case e: Error => Future { Left(ApiError.GenericError) }
     }
   }
 
@@ -42,7 +42,7 @@ class GameRepoImpl(database: Database) extends GameRepo {
       .run(selectGameRow)
       .map(gameRow =>
         gameRow match {
-          case None     => Left(GameNotFound("Game not found"))
+          case None     => Left(ApiError.GameNotFound)
           case Some(gr) => toGame(gr)
         }
       )
@@ -58,7 +58,7 @@ class GameRepoImpl(database: Database) extends GameRepo {
         )
       )
     } catch {
-      case e: Throwable => Left(ParsingError("Unable to parse the result"))
+      case e: Throwable => Left(ApiError.ParsingError)
     }
   }
 
