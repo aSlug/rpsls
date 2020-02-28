@@ -5,35 +5,37 @@ import model._
 import scala.util.Random
 import scala.concurrent.{ExecutionContext, Future}
 import wiro.annotation._
+import java.{util => ju}
+import scala.util.Failure
+import scala.util.Success
 
 @path("rps")
 trait GameController {
   @command
-  def play(userMove: Move): Future[Either[Throwable, Unit]]
+  def play(userMove: Move): Future[Either[ApiError, PlayResponse]]
   @query
-  def result(): Future[Either[GameNotFound, ApiResponse]]
+  def result(id: Int): Future[Either[ApiError, ResultResponse]]
 }
 
 class GameControllerImpl(gameService: GameService)(
     implicit exc: ExecutionContext
 ) extends GameController {
 
-  override def play(playerMove: Move): Future[Either[Throwable, Unit]] =
-    Future {
-      Right(gameService.makePlay(playerMove))
-    }
+  override def play(playerMove: Move): Future[Either[ApiError, PlayResponse]] =
+    gameService
+      .makePlay(playerMove)
+      .map(_.map(PlayResponse(_)))
 
-  override def result(): Future[Either[GameNotFound, ApiResponse]] = Future {
-    gameService.getResult() match {
-      case None => Left(new GameNotFound("Game not found"))
-      case Some(game) =>
-        Right(
-          ApiResponse(
+  override def result(id: Int): Future[Either[ApiError, ResultResponse]] =
+    gameService
+      .getResult(id)
+      .map(
+        _.map(game =>
+          ResultResponse(
             game.userMove,
             game.computerMove,
             game.result
           )
         )
-    }
-  }
+      )
 }

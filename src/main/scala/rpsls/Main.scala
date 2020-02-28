@@ -19,29 +19,33 @@ import wiro.server.akkaHttp.FailSupport._
 import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport._
 import io.circe.generic.auto._
 import io.buildo.enumero.circe._
-import rpsls.model.GameNotFound
 
 import io.circe.generic.auto._
 import io.circe.syntax._
 
+import slick.jdbc.PostgresProfile.api._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Await
+import rpsls.model._
+import rpsls.model.ApiError._
+
 object Main extends App with RouterDerivationModule {
+
+  val db = Database.forConfig("postgresDB")
+
   implicit val system = ActorSystem("rps")
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
 
-  implicit def throwableResponse: ToHttpResponse[Throwable] = null
-
-  implicit def notFoundToResponse = new ToHttpResponse[GameNotFound] {
-    def response(error: GameNotFound) = HttpResponse(
-      status = StatusCodes.NotFound,
-      entity = HttpEntity(
-        ContentType(MediaTypes.`application/json`),
-        error.asJson.noSpaces
-      )
-    )
+  implicit def apiErrorToResponse = new ToHttpResponse[ApiError] {
+    def response(error: ApiError) = error match {
+      case GameNotFound => HttpResponse(StatusCodes.NotFound)
+      case ParsingError => HttpResponse(StatusCodes.InternalServerError)
+      case GenericError => HttpResponse(StatusCodes.InternalServerError)
+    }
   }
 
-  val repo = new GameRepoImpl()
+  val repo = new GameRepoImpl(db)
   val service = new GameServiceImpl(repo)
   val controller = new GameControllerImpl(service)
   val routes = deriveRouter[GameController](controller)

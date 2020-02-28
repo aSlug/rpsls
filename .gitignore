@@ -1,6 +1,5 @@
 # sbt
 bin/
-project/
 target/
 build/
 
@@ -23,3 +22,7 @@ build/
 #general
 *.class
 .metals
+
+### Metals ###
+.metals/
+metals.sbt
