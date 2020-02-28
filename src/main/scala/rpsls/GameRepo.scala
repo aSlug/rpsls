@@ -25,8 +25,6 @@ class GameRepoImpl(database: Database) extends GameRepo {
   private val setup = DBIO.seq(games.schema.create)
   private val setupFuture = database.run(setup)
 
-  private val map = TrieMap.empty[Boolean, Game]
-
   override def write(game: Game): Future[Either[ApiError, Int]] = {
     try {
       val insertion = (games returning games.map(_.id)) += toGameRow(game)

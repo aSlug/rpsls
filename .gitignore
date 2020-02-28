@@ -22,3 +22,7 @@ build/
 #general
 *.class
 .metals
+
+### Metals ###
+.metals/
+metals.sbt
