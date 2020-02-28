@@ -24,27 +24,18 @@ class GameControllerImpl(gameService: GameService)(
   override def play(playerMove: Move): Future[Either[ApiError, PlayResponse]] =
     gameService
       .makePlay(playerMove)
-      .map(idOrError =>
-        idOrError match {
-          case Left(error) => Left(error)
-          case Right(id)   => Right(PlayResponse(id))
-        }
-      )
+      .map(_.map(PlayResponse(_)))
 
   override def result(id: Int): Future[Either[ApiError, ResultResponse]] =
     gameService
       .getResult(id)
-      .map(gameOrError =>
-        gameOrError match {
-          case Left(error) => Left(error)
-          case Right(game) =>
-            Right(
-              ResultResponse(
-                game.userMove,
-                game.computerMove,
-                game.result
-              )
-            )
-        }
+      .map(
+        _.map(game =>
+          ResultResponse(
+            game.userMove,
+            game.computerMove,
+            game.result
+          )
+        )
       )
 }
