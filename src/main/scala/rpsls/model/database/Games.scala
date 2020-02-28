@@ -1,6 +1,6 @@
 package rpsls.model.database
 
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
 import slick.lifted.Rep
 

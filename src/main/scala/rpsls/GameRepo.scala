@@ -4,7 +4,7 @@ import rpsls.model._
 
 import scala.collection.concurrent.TrieMap
 
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 import rpsls.model.database.Games
 import cats.instances.`package`.unit
 import io.buildo.enumero.CaseEnumIndex

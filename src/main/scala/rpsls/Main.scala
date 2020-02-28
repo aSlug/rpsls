@@ -23,7 +23,7 @@ import io.buildo.enumero.circe._
 import io.circe.generic.auto._
 import io.circe.syntax._
 
-import slick.jdbc.H2Profile.api._
+import slick.jdbc.PostgresProfile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import rpsls.model._
