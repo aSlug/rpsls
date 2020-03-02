@@ -8,6 +8,7 @@ import wiro.annotation._
 import java.{util => ju}
 import scala.util.Failure
 import scala.util.Success
+import cats.effect.IO
 
 @path("rps")
 trait GameController {
@@ -17,7 +18,7 @@ trait GameController {
   def result(id: Int): Future[Either[ApiError, ResultResponse]]
 }
 
-class GameControllerImpl(gameService: GameService)(
+class GameControllerImpl(gameService: GameService[IO])(
     implicit exc: ExecutionContext
 ) extends GameController {
 
@@ -25,6 +26,7 @@ class GameControllerImpl(gameService: GameService)(
     gameService
       .makePlay(playerMove)
       .map(_.map(PlayResponse(_)))
+      .unsafeToFuture()
 
   override def result(id: Int): Future[Either[ApiError, ResultResponse]] =
     gameService
@@ -38,4 +40,5 @@ class GameControllerImpl(gameService: GameService)(
           )
         )
       )
+      .unsafeToFuture()
 }

@@ -26,3 +26,4 @@ build/
 ### Metals ###
 .metals/
 metals.sbt
+.bloop/

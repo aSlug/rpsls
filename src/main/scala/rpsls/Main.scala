@@ -28,6 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Await
 import rpsls.model._
 import rpsls.model.ApiError._
+import cats.effect.IO
 
 object Main extends App with RouterDerivationModule {
 
@@ -45,8 +46,8 @@ object Main extends App with RouterDerivationModule {
     }
   }
 
-  val repo = new GameRepoImpl(db)
-  val service = new GameServiceImpl(repo)
+  val repo = new GameRepoImpl[IO](db)
+  val service = new GameServiceImpl[IO](repo)
   val controller = new GameControllerImpl(service)
   val routes = deriveRouter[GameController](controller)
 

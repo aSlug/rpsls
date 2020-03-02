@@ -13,30 +13,40 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import rpsls.model.database.GameRow
 import java.{util => ju}
+import cats.effect.Sync
+import cats.implicits._
+import scala.concurrent.duration.Duration
+import scala.concurrent.Await
 
-trait GameRepo {
-  def write(game: Game): Future[Either[ApiError, Int]]
-  def read(id: Int): Future[Either[ApiError, Game]]
+trait GameRepo[F[_]] {
+  def write(game: Game): F[Either[ApiError, Int]]
+  def read(id: Int): F[Either[ApiError, Game]]
 }
 
-class GameRepoImpl(database: Database) extends GameRepo {
+class GameRepoImpl[F[_]](database: Database)(implicit F: Sync[F])
+    extends GameRepo[F] {
 
   private val games = TableQuery[Games]
   private val setup = DBIO.seq(games.schema.create)
   private val setupFuture = database.run(setup)
 
-  override def write(game: Game): Future[Either[ApiError, Int]] = {
-    try {
+  override def write(game: Game): F[Either[ApiError, Int]] = {
+    val future = {
       val insertion = (games returning games.map(_.id)) += toGameRow(game)
       database.run(insertion).map(i => Right(i))
-    } catch {
-      case e: Error => Future { Left(ApiError.GenericError) }
+    }.recoverWith {
+      case e: Error => Future.successful(Left(ApiError.GenericError))
     }
+
+    //TODO: handle future lift
+    val result = Await.result(future, Duration.Inf)
+
+    F.delay(result)
   }
 
-  override def read(id: Int): Future[Either[ApiError, Game]] = {
+  override def read(id: Int): F[Either[ApiError, Game]] = {
     val selectGameRow = games.filter(_.id === id).result.headOption
-    database
+    val future = database
       .run(selectGameRow)
       .map(gameRow =>
         gameRow match {
@@ -44,6 +54,9 @@ class GameRepoImpl(database: Database) extends GameRepo {
           case Some(gr) => toGame(gr)
         }
       )
+    //TODO: handle future lift
+    val result = Await.result(future, Duration.Inf)
+    F.delay(result)
   }
 
   private def toGame(row: GameRow): Either[ApiError, Game] = {

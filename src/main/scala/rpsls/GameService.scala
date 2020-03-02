@@ -7,21 +7,23 @@ import Move._
 import Outcome._
 import java.{util => ju}
 import scala.concurrent.Future
+import cats.effect.Sync
 
-trait GameService {
-  def makePlay(playerMove: Move): Future[Either[ApiError, Int]]
-  def getResult(id: Int): Future[Either[ApiError, Game]]
+trait GameService[F[_]] {
+  def makePlay(playerMove: Move): F[Either[ApiError, Int]]
+  def getResult(id: Int): F[Either[ApiError, Game]]
 }
 
-class GameServiceImpl(repo: GameRepo) extends GameService {
+class GameServiceImpl[F[_]](repo: GameRepo[F])(implicit F: Sync[F])
+    extends GameService[F] {
 
-  override def makePlay(playerMove: Move): Future[Either[ApiError, Int]] = {
+  override def makePlay(playerMove: Move): F[Either[ApiError, Int]] = {
     val botMove = generateBotMove()
     val outcome = calculateOutcome(playerMove, botMove)
     repo.write(Game(playerMove, botMove, outcome))
   }
 
-  override def getResult(id: Int): Future[Either[ApiError, Game]] = {
+  override def getResult(id: Int): F[Either[ApiError, Game]] = {
     repo.read(id)
   }
 
